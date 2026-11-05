@@ -52,6 +52,14 @@ textarea.code{width:100%;height:76px;background:#000;color:#fff;border:1px solid
 .row button{flex:1;padding:12px;font:inherit;font-weight:800;cursor:pointer;border:0}
 .b1{background:var(--yellow);color:#000}.b2{background:#fff;color:#000}.b3{background:none;color:var(--muted);border:1px solid var(--line)!important}
 .note{color:var(--muted);font-size:.78rem;margin:10px 0 0}
+footer.brand{max-width:980px;margin:0 auto;padding:0 16px 48px}
+.logo .crown{display:block;width:38px;height:24px;margin-bottom:6px}
+.logo small{display:block;color:var(--muted);font-size:.85rem;font-weight:600;margin-top:6px}
+footer.brand .in{border-top:1px solid var(--line);padding-top:32px;display:flex;align-items:center;justify-content:center;gap:14px}
+.logo{display:flex;align-items:center;gap:14px}
+.logo svg{width:60px;height:60px;display:block;flex:none}
+.logo b{display:block;font-size:1.7rem;font-weight:900;font-stretch:112%;line-height:1;letter-spacing:-.01em}
+.logo span{display:block;color:var(--yellow);font-weight:700;letter-spacing:.28em;font-size:.72rem;margin-top:6px}
 @media(max-width:640px){form{grid-template-columns:1fr 1fr}.c2{grid-column:1/-1}header{flex-direction:column;align-items:flex-start}.total{text-align:left}}
 </style>
 </head>
@@ -94,6 +102,23 @@ textarea.code{width:100%;height:76px;background:#000;color:#fff;border:1px solid
     <div class="empty" id="empty" hidden>Nenhuma venda cadastrada ainda. Preencha o formulário acima.</div>
   </div>
 </div>
+
+<footer class="brand">
+  <div class="in">
+    <div class="logo" role="img" aria-label="Primos Multimarcas">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <rect width="64" height="64" fill="#FFD500"/>
+        <polygon points="64,0 64,64 24,64" fill="#000"/>
+        <text x="7" y="34" font-family="Archivo,'Arial Black',Arial,sans-serif" font-weight="900" font-size="32" fill="#000">P</text>
+        <text x="60" y="58" text-anchor="end" font-family="Archivo,'Arial Black',Arial,sans-serif" font-weight="900" font-size="22" fill="#fff">M</text>
+      </svg>
+      <div>
+        <svg class="crown" viewBox="0 0 40 24" aria-hidden="true"><path d="M2 22V6l9 8 9-12 9 12 9-8v16z" fill="#FFD500"/><circle cx="2" cy="5" r="2.2" fill="#FFD500"/><circle cx="20" cy="2" r="2.2" fill="#FFD500"/><circle cx="38" cy="5" r="2.2" fill="#FFD500"/><rect x="2" y="18" width="36" height="2" fill="#000"/></svg>
+        <b>Primos</b><span>Multimarcas</span><small>loja de variedades</small>
+      </div>
+    </div>
+  </div>
+</footer>
 
 <div class="ov" id="ov" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
