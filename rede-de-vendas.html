@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rede de Vendas</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+:root{--bg:#000;--panel:#111;--line:#2a2a2a;--text:#fff;--muted:#a8a8a8;--yellow:#FFD500;--ink:#000;--danger:#ff6b5b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Archivo",Arial,sans-serif;min-height:100vh}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;border-left:10px solid var(--yellow);padding-left:16px;margin-bottom:24px}
+h1{margin:0;font-size:clamp(2rem,7vw,3.6rem);font-weight:900;font-stretch:110%;line-height:.9;letter-spacing:-.02em}
+.sub{margin:6px 0 0;color:var(--muted);font-size:.9rem}
+.total{text-align:right}
+.total b{display:block;color:var(--yellow);font-size:clamp(1.5rem,5vw,2.2rem);font-weight:900}
+.total span{color:var(--muted);font-size:.85rem}
+form{background:var(--panel);border:1px solid var(--line);padding:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--muted)}
+input{background:#000;color:var(--text);border:1px solid var(--line);padding:12px;font:inherit;font-size:1rem;border-radius:0;width:100%}
+input:focus,button:focus-visible,textarea:focus{outline:2px solid var(--yellow);outline-offset:1px}
+.c2{grid-column:span 2}
+button.add{grid-column:1/-1;background:var(--yellow);color:var(--ink);border:0;padding:14px;font:inherit;font-weight:900;font-size:1.05rem;cursor:pointer}
+button.add:hover{filter:brightness(1.08)}
+.bar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.bar input{max-width:340px}
+.status{color:var(--muted);font-size:.8rem}
+.tablebox{overflow-x:auto;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line)}
+th{background:var(--panel);color:var(--muted);font-weight:600;font-size:.85rem}
+td.val{color:var(--yellow);font-weight:800;white-space:nowrap}
+td.cli{font-weight:700}
+.del{background:none;border:1px solid var(--line);color:var(--muted);padding:6px 10px;cursor:pointer;font:inherit;font-size:.85rem}
+.del:hover{color:var(--danger);border-color:var(--danger)}
+.empty{padding:32px;text-align:center;color:var(--muted)}
+.pix{background:var(--yellow);color:#000;border:0;padding:7px 12px;font:inherit;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap}
+.pago{background:#fff;color:#000;padding:4px 10px;font-weight:800;font-size:.8rem}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.85);display:grid;place-items:center;padding:16px;z-index:20;overflow:auto}
+.ov[hidden]{display:none}
+.modal{background:#111;border:1px solid var(--line);border-top:8px solid var(--yellow);max-width:380px;width:100%;padding:20px;text-align:center}
+.modal h2{margin:0 0 4px;font-size:1.2rem}
+.modal .v{color:var(--yellow);font-weight:900;font-size:1.8rem;margin-bottom:12px}
+.qrbox{background:#fff;display:inline-block;color:#000;width:min(280px,100%);aspect-ratio:1;padding:0}
+.qrbox svg{display:block;width:100%;height:100%}
+.qrbox p{margin:0;padding:20px;font-size:.85rem}
+textarea.code{width:100%;height:76px;background:#000;color:#fff;border:1px solid var(--line);font:12px monospace;padding:8px;margin-top:12px;resize:none}
+.row{display:flex;gap:8px;margin-top:10px}
+.row button{flex:1;padding:12px;font:inherit;font-weight:800;cursor:pointer;border:0}
+.b1{background:var(--yellow);color:#000}.b2{background:#fff;color:#000}.b3{background:none;color:var(--muted);border:1px solid var(--line)!important}
+.note{color:var(--muted);font-size:.78rem;margin:10px 0 0}
+@media(max-width:640px){form{grid-template-columns:1fr 1fr}.c2{grid-column:1/-1}header{flex-direction:column;align-items:flex-start}.total{text-align:left}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Rede de Vendas</h1>
+      <p class="sub">Cadastre cada venda com o nome do cliente.</p>
+    </div>
+    <div class="total"><b id="total">R$ 0,00</b><span id="count">0 vendas</span></div>
+  </header>
+
+  <form id="f" autocomplete="off">
+    <label class="c2">Nome do cliente
+      <input id="cliente" required maxlength="80" placeholder="Ex.: Maria Souza">
+    </label>
+    <label class="c2">Produto ou serviço
+      <input id="produto" maxlength="80" placeholder="Ex.: Plano anual">
+    </label>
+    <label class="c2">Valor (R$)
+      <input id="valor" type="number" required min="0" step="0.01" inputmode="decimal" placeholder="0,00">
+    </label>
+    <label class="c2">Data da venda
+      <input id="data" type="text" required inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" pattern="\d{2}/\d{2}/\d{4}">
+    </label>
+    <button class="add" type="submit">Cadastrar venda</button>
+  </form>
+
+  <div class="bar">
+    <input id="busca" type="search" placeholder="Buscar cliente" aria-label="Buscar cliente">
+    <span class="status" id="status">Carregando…</span>
+  </div>
+
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>Data</th><th>Cliente</th><th>Produto</th><th>Valor</th><th>Pagamento</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden>Nenhuma venda cadastrada ainda. Preencha o formulário acima.</div>
+  </div>
+</div>
+
+<div class="ov" id="ov" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+    <h2 id="ovTitle">Pix</h2>
+    <div class="v" id="ovValor"></div>
+    <div class="qrbox" id="qrbox"></div>
+    <textarea class="code" id="ovCode" readonly aria-label="Pix copia e cola"></textarea>
+    <div class="row"><button class="b1" type="button" id="ovCopy">Copiar código</button><button class="b2" type="button" id="ovPaid">Marcar como pago</button></div>
+    <p class="note">O Pix não avisa esta página. Confira o recebimento no app do seu banco e só então marque como pago.</p>
+    <div class="row"><button class="b3" type="button" id="ovClose">Fechar</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var PIX={chave:'+5579981306074',nome:'REDE DE VENDAS',cidade:'BRASIL'};
+  var sales=[], col=null, mode='local', cur=null;
+  var $=function(id){return document.getElementById(id)};
+  var brl=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+
+  /* ---------- data com máscara dd/mm/aaaa ---------- */
+  function todayBR(){var d=new Date();return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear()}
+  function maskDate(v){var d=v.replace(/\D/g,'').slice(0,8),o=d.slice(0,2);if(d.length>2)o+='/'+d.slice(2,4);if(d.length>4)o+='/'+d.slice(4);return o}
+  function toISO(s){
+    var m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s);if(!m)return null;
+    var d=+m[1],mo=+m[2],y=+m[3],dt=new Date(y,mo-1,d);
+    if(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d)return null;
+    return m[3]+'-'+m[2]+'-'+m[1];
+  }
+  function fmtDate(s){var p=(s||'').split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s}
+  $('data').value=todayBR();
+  $('data').addEventListener('input',function(){this.value=maskDate(this.value);this.setCustomValidity('')});
+
+  /* ---------- armazenamento ---------- */
+  function readLocal(){try{var r=localStorage.getItem('vendas');return r?JSON.parse(r):[]}catch(e){return []}}
+  function writeLocal(){try{localStorage.setItem('vendas',JSON.stringify(sales))}catch(e){}}
+  function setStatus(){$('status').textContent=mode==='db'?'Salvo na sua conta':'Salvo neste navegador'}
+
+  function render(){
+    var q=$('busca').value.trim().toLowerCase();
+    var list=sales.filter(function(s){return !q||(s.cliente||'').toLowerCase().indexOf(q)>-1});
+    list.sort(function(a,b){return (b.data||'').localeCompare(a.data||'')||(b.criado||0)-(a.criado||0)});
+    var tb=$('rows');tb.textContent='';
+    var total=0;
+    list.forEach(function(s){
+      total+=Number(s.valor)||0;
+      var tr=document.createElement('tr');
+      [['',fmtDate(s.data)],['cli',s.cliente],['',s.produto||'—'],['val',brl.format(Number(s.valor)||0)]].forEach(function(c){
+        var td=document.createElement('td');if(c[0])td.className=c[0];td.textContent=c[1];tr.appendChild(td);
+      });
+      var pt=document.createElement('td');
+      if(s.pago){var ok=document.createElement('span');ok.className='pago';ok.textContent='Pago';pt.appendChild(ok)}
+      else{var pb=document.createElement('button');pb.type='button';pb.className='pix';pb.textContent='Cobrar via Pix';pb.onclick=function(){openPix(s)};pt.appendChild(pb)}
+      tr.appendChild(pt);
+      var td=document.createElement('td');var b=document.createElement('button');
+      b.className='del';b.type='button';b.textContent='Excluir';
+      b.setAttribute('aria-label','Excluir venda de '+s.cliente);
+      b.onclick=function(){remove(s)};
+      td.appendChild(b);tr.appendChild(td);tb.appendChild(tr);
+    });
+    $('empty').hidden=list.length>0;
+    $('total').textContent=brl.format(total);
+    $('count').textContent=list.length+(list.length===1?' venda':' vendas');
+  }
+
+  function add(item){
+    if(mode==='db'&&col){col.add(item).catch(function(){$('status').textContent='Não foi possível salvar. Tente de novo.'})}
+    else{item.id='l'+item.criado;sales.push(item);writeLocal();render()}
+  }
+  function remove(s){
+    if(!confirm('Excluir a venda de '+s.cliente+'?'))return;
+    if(mode==='db'&&col){col.doc(s.id).delete().catch(function(){$('status').textContent='Não foi possível excluir. Tente de novo.'})}
+    else{sales=sales.filter(function(x){return x.id!==s.id});writeLocal();render()}
+  }
+
+  $('f').addEventListener('submit',function(e){
+    e.preventDefault();
+    var iso=toISO($('data').value);
+    if(!iso){$('data').setCustomValidity('Use dia/mês/ano, por exemplo 05/11/2026');$('data').reportValidity();return}
+    var item={cliente:$('cliente').value.trim(),produto:$('produto').value.trim(),valor:parseFloat($('valor').value),data:iso,criado:Date.now()};
+    if(!item.cliente||isNaN(item.valor))return;
+    add(item);
+    $('cliente').value='';$('produto').value='';$('valor').value='';
+    $('cliente').focus();
+  });
+  $('busca').addEventListener('input',render);
+
+  /* ---------- Pix (BR Code estático) ---------- */
+  function tlv(id,v){return id+String(v.length).padStart(2,'0')+v}
+  function crc16(s){var c=0xFFFF;for(var i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(var j=0;j<8;j++){c=(c&0x8000)?((c<<1)^0x1021):(c<<1);c&=0xFFFF}}return c.toString(16).toUpperCase().padStart(4,'0')}
+  function pixPayload(valor){
+    var acct=tlv('00','BR.GOV.BCB.PIX')+tlv('01',PIX.chave);
+    var p=tlv('00','01')+tlv('01','11')+tlv('26',acct)+tlv('52','0000')+tlv('53','986');
+    if(valor>0)p+=tlv('54',valor.toFixed(2));
+    p+=tlv('58','BR')+tlv('59',PIX.nome)+tlv('60',PIX.cidade)+tlv('62',tlv('05','***'))+'6304';
+    return p+crc16(p);
+  }
+
+  /* QR em SVG, com borda branca de 4 módulos e quadrados nítidos */
+  function drawQR(code){
+    var box=$('qrbox');box.textContent='';
+    try{
+      var qr=qrcode(0,'M');qr.addData(code);qr.make();
+      var n=qr.getModuleCount(),q=4,d='';
+      for(var r=0;r<n;r++)for(var c=0;c<n;c++)if(qr.isDark(r,c))d+='M'+(c+q)+' '+(r+q)+'h1v1h-1z';
+      var s=n+q*2;
+      box.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+s+' '+s+'" shape-rendering="crispEdges" role="img" aria-label="QR Code Pix"><rect width="'+s+'" height="'+s+'" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>';
+    }catch(e){
+      var p=document.createElement('p');p.textContent='Não foi possível gerar o QR Code. Use o código copia e cola abaixo.';box.appendChild(p);
+    }
+  }
+  function withQR(cb){
+    if(typeof qrcode!=='undefined')return cb();
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
+    s.onload=cb;s.onerror=cb;document.head.appendChild(s);
+  }
+  function openPix(s){
+    cur=s;
+    var valor=Number(s.valor)||0;
+    $('ovTitle').textContent='Pix para '+s.cliente;
+    $('ovValor').textContent=brl.format(valor);
+    var code=pixPayload(valor);
+    $('ovCode').value=code;
+    $('qrbox').textContent='';
+    withQR(function(){drawQR(code)});
+    $('ov').hidden=false;
+  }
+  function closePix(){$('ov').hidden=true;cur=null}
+  $('ovClose').onclick=closePix;
+  $('ov').addEventListener('click',function(e){if(e.target===$('ov'))closePix()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('ov').hidden)closePix()});
+  $('ovCopy').onclick=function(){
+    var t=$('ovCode');t.select();
+    var done=function(){$('ovCopy').textContent='Copiado!';setTimeout(function(){$('ovCopy').textContent='Copiar código'},1500)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t.value).then(done,function(){try{document.execCommand('copy')}catch(e){}done()})}
+    else{try{document.execCommand('copy')}catch(e){}done()}
+  };
+  $('ovPaid').onclick=function(){
+    var s=cur;if(!s)return;
+    if(mode==='db'&&col){col.doc(s.id).update({pago:true,pagoEm:Date.now()}).catch(function(){$('status').textContent='Não foi possível atualizar. Tente de novo.'})}
+    else{s.pago=true;s.pagoEm=Date.now();writeLocal();render()}
+    closePix();
+  };
+
+  /* ---------- início ---------- */
+  sales=readLocal();setStatus();render();
+
+  (async function(){
+    try{
+      if(!window.claude||!claude.use)return;
+      var user=await claude.use('user'),db=await claude.use('db');
+      if(!user||!db)return;
+      var uid=await user.id();
+      col=db.collection('data/users/'+uid+'/vendas');
+      mode='db';sales=[];$('status').textContent='Carregando…';render();
+      var timer=setTimeout(function(){$('status').textContent='Sem conexão com a conta. Os dados podem estar desatualizados.'},10000);
+      col.onSnapshot(function(snap){
+        clearTimeout(timer);
+        sales=snap.docs.map(function(d){var v=typeof d.data==='function'?d.data():d.data;return Object.assign({id:d.id},v)});
+        setStatus();render();
+      },function(){clearTimeout(timer);mode='local';col=null;sales=readLocal();setStatus();render()});
+    }catch(e){}
+  })();
+})();
+</script>
+</body>
+</html>
